@@ -19,9 +19,7 @@ const String mtxinput =
 "0101 0001 0100 1100 0110 0111 0000 1000 "
 "0010 0000 0000 0000 0000 0000 0001 0100 "
 "0000 0000 0000 0000 0000 0000 0000 0000";
-
-String firstFrame;
-String secondFrame;  
+ 
 uint8_t ledmatrix[2][256];
 
 void setup() {
@@ -30,10 +28,16 @@ void setup() {
 
   delay(250);
 
+  String firstFrame;
+  String secondFrame; 
+
+  firstFrame = mtxinput;
+  firstFrame.remove(320, 321);
+  firstFrame.replace(" ", "");
+
   secondFrame = mtxinput.substring(320);
   secondFrame.replace(" ", "");
-
-  Serial.println(secondFrame);
+  secondFrame.remove(0, 1);
 
 }
 
