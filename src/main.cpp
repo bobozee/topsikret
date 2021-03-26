@@ -21,7 +21,7 @@ const String mtxinput =
 "0000 0000 0000 0000 0000 0000 0000 0000";
  
 uint8_t ledmatrix[2][256];
-Adafruit_NeoPixel matrix(256, 0, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel matrix(256, D4, NEO_GRB + NEO_KHZ800);
 
 void setup() {
 
@@ -42,12 +42,13 @@ void setup() {
 
   for (int i = 0; i < 256; i++) {
     
-    ledmatrix[0][i] = (uint8_t)firstFrame.charAt(i);
-    ledmatrix[1][i] = (uint8_t)secondFrame.charAt(i);
+    ledmatrix[0][i] = firstFrame.charAt(i) - '0';
+    ledmatrix[1][i] = secondFrame.charAt(i) - '0';
 
   }
 
   matrix.begin();
+  matrix.setBrightness(20);
   matrix.show();
 
 }
@@ -58,11 +59,8 @@ void lightUp() {
 
   for (int i = 0; i < 256; i++) {
 
-    if (ledmatrix[0][i] == 1) {
-
-      matrix.setPixelColor(i, 255, 255, 255);
-
-    }
+    uint32_t color = matrix.Color(255, 255, 255);
+    matrix.setPixelColor(i, color * ledmatrix[0][i]);
 
   }
 
