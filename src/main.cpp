@@ -21,6 +21,7 @@ const String mtxinput =
 "0000 0000 0000 0000 0000 0000 0000 0000";
  
 uint8_t ledmatrix[2][256];
+Adafruit_NeoPixel matrix(256, 0, NEO_GRB + NEO_KHZ800);
 
 void setup() {
 
@@ -46,19 +47,9 @@ void setup() {
 
   }
 
-  Adafruit_NeoPixel matrix(256, 0, NEO_GRB + NEO_KHZ800);
   matrix.begin();
   matrix.show();
 
-}
-
-void loop() {
-
-  lightUp();
-  delay(500);
-  matrix.clear();
-  matrix.show();
-  delay(500);
 }
 
 void lightUp() {
@@ -77,4 +68,13 @@ void lightUp() {
 
   matrix.show();
 
+}
+
+void loop() {
+
+  lightUp();
+  delay(500);
+  matrix.clear();
+  matrix.show();
+  delay(500);
 }
