@@ -41,15 +41,40 @@ void setup() {
 
   for (int i = 0; i < 256; i++) {
     
-    ledmatrix[0][i] = firstFrame.charAt(i);
-    ledmatrix[1][i] = secondFrame.charAt(i);
+    ledmatrix[0][i] = (uint8_t)firstFrame.charAt(i);
+    ledmatrix[1][i] = (uint8_t)secondFrame.charAt(i);
 
   }
 
-  
+  Adafruit_NeoPixel matrix(256, 0, NEO_GRB + NEO_KHZ800);
+  matrix.begin();
+  matrix.show();
 
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+
+  lightUp();
+  delay(500);
+  matrix.clear();
+  matrix.show();
+  delay(500);
+}
+
+void lightUp() {
+
+  matrix.clear();
+
+  for (int i = 0; i < 256; i++) {
+
+    if (ledmatrix[0][i] == 1) {
+
+      matrix.setPixelColor(i, 255, 255, 255);
+
+    }
+
+  }
+
+  matrix.show();
+
 }
