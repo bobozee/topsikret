@@ -61,11 +61,13 @@ int intdiv(int divident, int divisor) {
 
 int matrixRotate(int x) {
 
-  int buffer = (8 * (x % 32)) + intdiv(x, 32);
-  if ((x % 32) % 2) {
-    return buffer + 7;
+  int line = intdiv(x, 32);
+  int row = x % 32;
+  int y = (8 * row) + line;
+  if (row % 2) {
+    return y + (7 - (line * 2));
   } else {
-    return buffer;
+    return y;
   }
 
 }
@@ -88,7 +90,7 @@ void lightUp() {
 void loop() {
 
   lightUp();
-  delay(500);
+  delay(10000);
   matrix.clear();
   matrix.show();
   delay(500);
