@@ -1,6 +1,13 @@
 #include <Adafruit_NeoPixel.h>
 #include <iostream>
 
+#define MATRIX_X 32
+#define MATRIX_Y 8
+#define MATRIX_UNITS MATRIX_X * MATRIX_Y
+#define FRAMES_NUM 2
+#define MATRIX_PIN D4
+#define FPS 5
+
 const String mtxinput = 
 "0000 0000 0000 0000 0000 0000 0000 0000 " 
 "0000 0001 1000 1100 0110 0111 0000 0000 "
@@ -10,7 +17,7 @@ const String mtxinput =
 "0010 0001 0100 1100 0110 0111 0001 0100 "
 "0101 0000 0000 0000 0000 0000 0000 1000 "
 "0000 0000 0000 0000 0000 0000 0000 0000 "
-"n "
+
 "0000 0000 0000 0000 0000 0000 0000 0000 "
 "0000 0001 1000 1100 0110 0111 0000 0000 "
 "0000 0101 0101 0010 1000 0100 0100 0000 "
@@ -20,16 +27,16 @@ const String mtxinput =
 "0010 0000 0000 0000 0000 0000 0001 0100 "
 "0000 0000 0000 0000 0000 0000 0000 0000";
  
-uint8_t ledmatrix[2][256];
-Adafruit_NeoPixel matrix(256, D4, NEO_GRB + NEO_KHZ800);
+uint8_t ledmatrix[FRAMES_NUM][MATRIX_UNITS];
+Adafruit_NeoPixel matrix(MATRIX_UNITS, MATRIX_PIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
 
   Serial.begin(9600);
-
+  
   delay(250);
 
-  String firstFrame;
+  /*String firstFrame;
   String secondFrame; 
 
   firstFrame = mtxinput;
@@ -44,6 +51,29 @@ void setup() {
     
     ledmatrix[0][i] = firstFrame.charAt(i) - '0';
     ledmatrix[1][i] = secondFrame.charAt(i) - '0';
+
+  }*/
+
+  String mtxInputBuffer = mtxinput;
+  
+  mtxInputBuffer.replace(" ", "");
+
+  int frameIndex = 0;
+  int pixelIndex = 0;
+  for (unsigned int i = 0; i < mtxInputBuffer.length(); i++) {
+
+    char c = mtxInputBuffer.charAt(i);
+
+    if (pixelIndex > MATRIX_UNITS - 1) {
+
+      pixelIndex = 0;
+      frameIndex++;
+
+    }
+
+    ledmatrix[frameIndex][pixelIndex] = c - '0';
+    
+    pixelIndex++;
 
   }
 
@@ -72,14 +102,14 @@ int matrixRotate(int x) {
 
 }
 
-void lightUp() {
+void lightUp(int frame) {
 
   matrix.clear();
 
   for (int i = 0; i < 256; i++) {
 
     uint32_t color = matrix.Color(255, 255, 255);
-    matrix.setPixelColor(matrixRotate(i), color * ledmatrix[0][i]);
+    matrix.setPixelColor(matrixRotate(i), color * ledmatrix[frame][i]);
 
   }
 
@@ -89,11 +119,12 @@ void lightUp() {
 
 void loop() {
 
-  lightUp();
-  delay(10000);
-  matrix.clear();
-  matrix.show();
-  delay(500);
+  for (int i = 0; i < FRAMES_NUM; i++) {
+
+    lightUp(i);
+    delay(1000 / FPS);
+
+  }
 
 }
 
