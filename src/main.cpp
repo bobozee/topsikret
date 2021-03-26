@@ -53,6 +53,23 @@ void setup() {
 
 }
 
+int intdiv(int divident, int divisor) {
+
+  return (int)(divident / divisor);
+
+}
+
+int matrixRotate(int x) {
+
+  int buffer = (8 * (x % 32)) + intdiv(x, 32);
+  if ((x % 32) % 2) {
+    return buffer + 7;
+  } else {
+    return buffer;
+  }
+
+}
+
 void lightUp() {
 
   matrix.clear();
@@ -60,7 +77,7 @@ void lightUp() {
   for (int i = 0; i < 256; i++) {
 
     uint32_t color = matrix.Color(255, 255, 255);
-    matrix.setPixelColor(i, color * ledmatrix[0][i]);
+    matrix.setPixelColor(matrixRotate(i), color * ledmatrix[0][i]);
 
   }
 
@@ -75,4 +92,6 @@ void loop() {
   matrix.clear();
   matrix.show();
   delay(500);
+
 }
+
