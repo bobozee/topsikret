@@ -39,6 +39,15 @@ void setup() {
   secondFrame.replace(" ", "");
   secondFrame.remove(0, 1);
 
+  for (int i = 0; i < 256; i++) {
+    
+    ledmatrix[0][i] = firstFrame.charAt(i);
+    ledmatrix[1][i] = secondFrame.charAt(i);
+
+  }
+
+  
+
 }
 
 void loop() {
