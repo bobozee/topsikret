@@ -6,7 +6,8 @@
 #define MATRIX_UNITS MATRIX_X * MATRIX_Y
 #define FRAMES_NUM 2
 #define MATRIX_PIN D4
-#define FPS 5
+#define FPS 60
+#define FPS_PER_FRAME 20
 
 const String mtxinput = 
 "0000 0000 0000 0000 0000 0000 0000 0000 " 
@@ -29,30 +30,13 @@ const String mtxinput =
  
 uint8_t ledmatrix[FRAMES_NUM][MATRIX_UNITS];
 Adafruit_NeoPixel matrix(MATRIX_UNITS, MATRIX_PIN, NEO_GRB + NEO_KHZ800);
+int count = 0;
 
 void setup() {
 
   Serial.begin(9600);
   
   delay(250);
-
-  /*String firstFrame;
-  String secondFrame; 
-
-  firstFrame = mtxinput;
-  firstFrame.remove(320, 321);
-  firstFrame.replace(" ", "");
-
-  secondFrame = mtxinput.substring(320);
-  secondFrame.replace(" ", "");
-  secondFrame.remove(0, 1);
-
-  for (int i = 0; i < 256; i++) {
-    
-    ledmatrix[0][i] = firstFrame.charAt(i) - '0';
-    ledmatrix[1][i] = secondFrame.charAt(i) - '0';
-
-  }*/
 
   String mtxInputBuffer = mtxinput;
   
@@ -72,7 +56,7 @@ void setup() {
     }
 
     ledmatrix[frameIndex][pixelIndex] = c - '0';
-    
+
     pixelIndex++;
 
   }
@@ -119,12 +103,15 @@ void lightUp(int frame) {
 
 void loop() {
 
-  for (int i = 0; i < FRAMES_NUM; i++) {
+  lightUp(intdiv(count, FPS_PER_FRAME));
+  count++;
+  if (count == FPS_PER_FRAME * FRAMES_NUM) {
 
-    lightUp(i);
-    delay(1000 / FPS);
+    count = 0;
 
   }
+
+  delay(1000 / FPS);
 
 }
 
