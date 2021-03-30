@@ -1,19 +1,20 @@
 #include <Adafruit_NeoPixel.h>
 #include <iostream>
 
-#define MATRIX_X 32
-#define MATRIX_Y 8
+#define MATRIX_X 32 //width of the matrix
+#define MATRIX_Y 8 //height of the matrix
 #define MATRIX_UNITS MATRIX_X * MATRIX_Y
-#define FRAMES_NUM 4
-#define MATRIX_PIN D4
-#define FPS 8
-#define FPS_PER_FRAME 1
+#define FRAMES_NUM 8 //number of frames
+#define MATRIX_PIN D4 //pin of the matrix
+#define FPS 6 //speed of the animation in Frames Per Second
+#define FPS_PER_FRAME_RATIO 1 //ratio between fps and frame duration; 1 is exactly fps, 2 is 2 times fps, etc; bigger or equal 1 (useful for asynchronous effects during the animation)
+#define CYCLEDURATION (FPS_PER_FRAME_RATIO * FRAMES_NUM) / FPS //duration of one animation cycle in seconds
 
-#define COLORBIN1 0xA717D7
-#define COLORBIN2 0xF4F4DF
-#define COLORA 0x8BD3E6
-#define COLORB 0xF6EB61
-#define COLORC 0x000000
+#define COLORBIN1 0xA717D7 //first color of a binary led
+#define COLORBIN2 0xF4F4DF //second color of a binary led
+#define COLORA 0x8BD3E6 //color of A-led
+#define COLORB 0xF6EB61 //color of B-led
+#define COLORC 0x000000 //color of C-led
 
 const String mtxinput = 
 "0000 0000 0000 0000 0000 0000 0000 0000 " 
@@ -21,8 +22,8 @@ const String mtxinput =
 "0000 0A02 0202 0020 2000 0200 0A00 0000 "
 "00AA A002 2002 0020 0220 0222 00AA A000 "
 "0000 0A02 0202 0020 0002 0200 0A00 0000 "
-"00B0 0002 0200 2200 0220 0222 000B 0B00 "
-"0B0B 0000 0000 0000 0000 0000 0000 B000 "
+"B0B0 0002 0200 2200 0220 0222 000B 0B00 "
+"0B0B 0000 0000 0000 0000 0000 0000 B0B0 "
 "0000 000A 0A0A 0A0A 0A0A 0A0A 0000 0000 "
 
 "0000 0000 0000 0000 0000 0000 0000 0000 " 
@@ -30,8 +31,8 @@ const String mtxinput =
 "0000 0A02 0202 0020 2000 0200 0A00 0000 "
 "00AA A002 2002 0020 0220 0222 00AA A000 "
 "0000 0A02 0202 0020 0002 0200 0A00 0000 "
-"00B0 0002 0200 2200 0220 0222 000B 0B00 "
-"0B0B 0000 0000 0000 0000 0000 0000 B000 "
+"B0B0 0002 0200 2200 0220 0222 000B 0B00 "
+"0B0B 0000 0000 0000 0000 0000 0000 B0B0 "
 "0000 0000 A0A0 A0A0 A0A0 A0A0 0000 0000 "
 
 "0000 0000 0000 0000 0000 0000 0000 0000 " 
@@ -39,8 +40,8 @@ const String mtxinput =
 "0000 0A02 0202 0020 2000 0200 0A00 0000 "
 "00AA A002 2002 0020 0220 0222 00AA A000 "
 "0000 0A02 0202 0020 0002 0200 0A00 0000 "
-"0B0B 0002 0200 2200 0220 0222 0000 B000 "
-"00B0 0000 0000 0000 0000 0000 000B 0B00 "
+"B0B0 0002 0200 2200 0220 0222 000B 0B00 "
+"0B0B 0000 0000 0000 0000 0000 0000 B0B0 "
 "0000 000A 0A0A 0A0A 0A0A 0A0A 0000 0000 "
 
 "0000 0000 0000 0000 0000 0000 0000 0000 " 
@@ -48,13 +49,50 @@ const String mtxinput =
 "0000 0A02 0202 0020 2000 0200 0A00 0000 "
 "00AA A002 2002 0020 0220 0222 00AA A000 "
 "0000 0A02 0202 0020 0002 0200 0A00 0000 "
-"0B0B 0002 0200 2200 0220 0222 0000 B000 "
-"00B0 0000 0000 0000 0000 0000 000B 0B00 "
+"B0B0 0002 0200 2200 0220 0222 000B 0B00 "
+"0B0B 0000 0000 0000 0000 0000 0000 B0B0 "
+"0000 0000 A0A0 A0A0 A0A0 A0A0 0000 0000 "
+
+"0000 0000 0000 0000 0000 0000 0000 0000 " 
+"0000 0002 2000 2200 0220 0222 0000 0000 "
+"0000 0A02 0202 0020 2000 0200 0A00 0000 "
+"00AA A002 2002 0020 0220 0222 00AA A000 "
+"0000 0A02 0202 0020 0002 0200 0A00 0000 "
+"0B0B 0002 0200 2200 0220 0222 0000 B0B0 "
+"B0B0 0000 0000 0000 0000 0000 000B 0B00 "
+"0000 000A 0A0A 0A0A 0A0A 0A0A 0000 0000 "
+
+"0000 0000 0000 0000 0000 0000 0000 0000 " 
+"0000 0002 2000 2200 0220 0222 0000 0000 "
+"0000 0A02 0202 0020 2000 0200 0A00 0000 "
+"00AA A002 2002 0020 0220 0222 00AA A000 "
+"0000 0A02 0202 0020 0002 0200 0A00 0000 "
+"0B0B 0002 0200 2200 0220 0222 0000 B0B0 "
+"B0B0 0000 0000 0000 0000 0000 000B 0B00 "
+"0000 0000 A0A0 A0A0 A0A0 A0A0 0000 0000 "
+
+"0000 0000 0000 0000 0000 0000 0000 0000 " 
+"0000 0002 2000 2200 0220 0222 0000 0000 "
+"0000 0A02 0202 0020 2000 0200 0A00 0000 "
+"00AA A002 2002 0020 0220 0222 00AA A000 "
+"0000 0A02 0202 0020 0002 0200 0A00 0000 "
+"0B0B 0002 0200 2200 0220 0222 0000 B0B0 "
+"B0B0 0000 0000 0000 0000 0000 000B 0B00 "
+"0000 000A 0A0A 0A0A 0A0A 0A0A 0000 0000 "
+
+"0000 0000 0000 0000 0000 0000 0000 0000 " 
+"0000 0002 2000 2200 0220 0222 0000 0000 "
+"0000 0A02 0202 0020 2000 0200 0A00 0000 "
+"00AA A002 2002 0020 0220 0222 00AA A000 "
+"0000 0A02 0202 0020 0002 0200 0A00 0000 "
+"0B0B 0002 0200 2200 0220 0222 0000 B0B0 "
+"B0B0 0000 0000 0000 0000 0000 000B 0B00 "
 "0000 0000 A0A0 A0A0 A0A0 A0A0 0000 0000 ";
  
 char ledmatrix[FRAMES_NUM][MATRIX_UNITS];
 Adafruit_NeoPixel matrix(MATRIX_UNITS, MATRIX_PIN, NEO_GRB + NEO_KHZ800);
 int count = 0;
+double elapsedTime = 0;
 
 void setup() {
 
@@ -86,7 +124,7 @@ void setup() {
   }
 
   matrix.begin();
-  matrix.setBrightness(40);
+  matrix.setBrightness(0);
   matrix.show();
 
 }
@@ -134,12 +172,43 @@ void lightUp(int frame) {
 
 }
 
+void doFrame() {
+  lightUp(intdiv(count, FPS_PER_FRAME_RATIO));
+}
+
+int clamp(int value, int min, int max) {
+  return value > max ? max : value < min ? min : value;
+}
+
+void animation() {
+
+  if (elapsedTime >= 5) {
+
+    if (elapsedTime >= 10) {
+      matrix.setBrightness(clamp(matrix.getBrightness() - 5, 0, 60));
+    } else {
+      matrix.setBrightness(clamp(matrix.getBrightness() + 5, 0, 60));
+    }
+
+    doFrame();
+
+  } else {
+
+    matrix.clear();
+    matrix.show();
+
+  }
+
+}
+
 void loop() {
 
-  lightUp(intdiv(count, FPS_PER_FRAME));
+  animation();
+
+  elapsedTime += (1000 / FPS) * 0.001f;
 
   count++;
-  if (count == FPS_PER_FRAME * FRAMES_NUM) {
+  if (count == FPS_PER_FRAME_RATIO * FRAMES_NUM) {
 
     count = 0;
 
