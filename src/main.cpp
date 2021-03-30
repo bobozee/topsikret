@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
-#include <SoftwareSerial.h>
-#include <DFRobotDFPlayerMini.h>
+//#include <SoftwareSerial.h>
+//#include <DFRobotDFPlayerMini.h>
 #include <iostream>
 
 #define MATRIX_X 32 //width of the matrix
@@ -15,6 +15,7 @@
 #define FPS 6 //speed of the animation in Frames Per Second
 #define FPS_PER_FRAME_RATIO 1 //ratio between fps and frame duration; 1 is exactly fps, 2 is 2 times fps, etc; bigger or equal 1 (useful for asynchronous effects during the animation)
 #define CYCLEDURATION (FPS_PER_FRAME_RATIO * FRAMES_NUM) / FPS //duration of one animation cycle in seconds
+#define CURRENTFRAME intdiv(count, FPS_PER_FRAME_RATIO)
 
 #define COLORBIN1 0xA717D7 //first color of a binary led
 #define COLORBIN2 0xF4F4DF //second color of a binary led
@@ -97,15 +98,15 @@ const String mtxinput =
  
 char ledmatrix[FRAMES_NUM][MATRIX_UNITS];
 Adafruit_NeoPixel matrix(MATRIX_UNITS, MATRIX_PIN, NEO_GRB + NEO_KHZ800);
-SoftwareSerial playerSerial(PLAYER_PIN_RX, PLAYER_PIN_TX);
-DFRobotDFPlayerMini player;
+//SoftwareSerial playerSerial(PLAYER_PIN_RX, PLAYER_PIN_TX);
+//DFRobotDFPlayerMini player;
 int count = 0;
 double elapsedTime = 0;
 
 void setup() {
 
   Serial.begin(9600);
-  playerSerial.begin(9600);
+  //playerSerial.begin(9600);
   
   delay(250);
 
@@ -133,11 +134,11 @@ void setup() {
   }
 
   matrix.begin();
-  matrix.setBrightness(0);
+  matrix.setBrightness(20);
   matrix.show();
 
-  player.volume(5);
-  player.play(1);
+  //player.volume(5);
+  //player.play(1);
 
 }
 
@@ -184,8 +185,8 @@ void lightUp(int frame) {
 
 }
 
-void doFrame() {
-  lightUp(intdiv(count, FPS_PER_FRAME_RATIO));
+void nextFrame() {
+  lightUp(CURRENTFRAME);
 }
 
 int clamp(int value, int min, int max) {
@@ -196,15 +197,17 @@ void animation() {
 
   if (elapsedTime >= 5) {
 
-    if (elapsedTime >= 10) {
+    if (elapsedTime <= 5.2) {
+      matrix.setBrightness(0);
+    } else if (elapsedTime >= 10) {
       matrix.setBrightness(clamp(matrix.getBrightness() - 5, 0, 60));
-      player.volume(clamp(player.readVolume() - 2, 0, 30);
+      //player.volume(clamp(player.readVolume() - 2, 0, 30));
     } else {
       matrix.setBrightness(clamp(matrix.getBrightness() + 5, 0, 60));
-      player.volume(clamp(player.readVolume() + 2, 0, 30);
+      //player.volume(clamp(player.readVolume() + 2, 0, 30));
     }
 
-    doFrame();
+    nextFrame();
 
   } else {
 
@@ -219,6 +222,8 @@ void loop() {
 
   animation();
 
+  delay(1000 / FPS);
+
   elapsedTime += (1000 / FPS) * 0.001f;
 
   count++;
@@ -227,8 +232,6 @@ void loop() {
     count = 0;
 
   }
-
-  delay(1000 / FPS);
 
 }
 
