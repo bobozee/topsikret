@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
-//#include <SoftwareSerial.h>
-//#include <DFRobotDFPlayerMini.h>
+#include <SoftwareSerial.h>
+#include <DFRobotDFPlayerMini.h>
 #include <iostream>
 
 #define MATRIX_X 32 //width of the matrix
@@ -8,8 +8,8 @@
 #define MATRIX_UNITS MATRIX_X * MATRIX_Y
 #define MATRIX_PIN D4 //pin of the matrix
 
-#define PLAYER_PIN_RX 3
-#define PLAYER_PIN_TX 1
+#define PLAYER_PIN_TX D1
+#define PLAYER_PIN_RX D2
 
 #define FRAMES_NUM 8 //number of frames
 #define FPS 6 //speed of the animation in Frames Per Second
@@ -98,15 +98,15 @@ const String mtxinput =
  
 char ledmatrix[FRAMES_NUM][MATRIX_UNITS];
 Adafruit_NeoPixel matrix(MATRIX_UNITS, MATRIX_PIN, NEO_GRB + NEO_KHZ800);
-//SoftwareSerial playerSerial(PLAYER_PIN_RX, PLAYER_PIN_TX);
-//DFRobotDFPlayerMini player;
+SoftwareSerial playerSerial(PLAYER_PIN_RX, PLAYER_PIN_TX);
+DFRobotDFPlayerMini player;
 int count = 0;
 double elapsedTime = 0;
 
 void setup() {
 
   Serial.begin(9600);
-  //playerSerial.begin(9600);
+  playerSerial.begin(9600);
   
   delay(250);
 
@@ -137,8 +137,9 @@ void setup() {
   matrix.setBrightness(20);
   matrix.show();
 
-  //player.volume(5);
-  //player.play(1);
+  player.begin(playerSerial);
+  player.volume(20);
+  player.play(1);
 
 }
 
@@ -201,10 +202,8 @@ void animation() {
       matrix.setBrightness(0);
     } else if (elapsedTime >= 10) {
       matrix.setBrightness(clamp(matrix.getBrightness() - 5, 0, 60));
-      //player.volume(clamp(player.readVolume() - 2, 0, 30));
     } else {
       matrix.setBrightness(clamp(matrix.getBrightness() + 5, 0, 60));
-      //player.volume(clamp(player.readVolume() + 2, 0, 30));
     }
 
     nextFrame();
