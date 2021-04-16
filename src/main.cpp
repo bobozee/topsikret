@@ -151,11 +151,11 @@ int intdiv(int divident, int divisor) {
 
 int matrixRotate(int x) {
 
-  int line = intdiv(x, 32);
-  int row = x % 32;
-  int y = (8 * row) + line;
+  int line = intdiv(x, MATRIX_X);
+  int row = x % MATRIX_X;
+  int y = (MATRIX_Y * row) + line;
   if (row % 2) {
-    return y + (7 - (line * 2));
+    return y + ((MATRIX_X - 1) - (line * 2));
   } else {
     return y;
   }
@@ -200,7 +200,7 @@ void animation() {
 
     if (elapsedTime <= 5.2) {
       matrix.setBrightness(0);
-    } else if (elapsedTime >= 10) {
+    } else if (elapsedTime >= 20) {
       matrix.setBrightness(clamp(matrix.getBrightness() - 5, 0, 60));
     } else {
       matrix.setBrightness(clamp(matrix.getBrightness() + 5, 0, 60));
