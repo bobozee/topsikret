@@ -166,7 +166,7 @@ void lightUp(int frame) {
 
   matrix.clear();
 
-  for (int i = 0; i < 256; i++) {
+  for (int i = 0; i < MATRIX_UNITS; i++) {
 
     char matval = ledmatrix[frame][i];
     uint32_t color = 0;
